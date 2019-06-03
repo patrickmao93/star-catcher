@@ -22,13 +22,10 @@ export default class Block extends cc.Component {
 
     // LIFE-CYCLE CALLBACKS:
 
-    onLoad() {
-        this.collisionRadius = this.node.width;
-    }
+    // onLoad() {}
 
     init(game, type: BlockTypes) {
         this.game = game;
-
         switch (type) {
             case 1:
                 this.node.getComponent(cc.Sprite).spriteFrame = this.blockSprite;
@@ -41,6 +38,13 @@ export default class Block extends cc.Component {
                 break;
 
             case 3:
+                this.node.getComponent(cc.Sprite).spriteFrame = this.starSprite;
+                this.blockType = BlockTypes.MegaStar;
+                this.node.width = 50;
+                this.node.height = 50;
+                break;
+
+            case 4:
                 this.node.getComponent(cc.Sprite).spriteFrame = this.magnetSprite;
                 this.blockType = BlockTypes.Magnet;
                 break;
@@ -48,6 +52,8 @@ export default class Block extends cc.Component {
             default:
                 break;
         }
+
+        this.collisionRadius = this.node.width;
     }
 
     start() {}
@@ -74,6 +80,11 @@ export default class Block extends cc.Component {
 
                 case BlockTypes.Star:
                     this.game.gainScore();
+                    this.node.destroy();
+                    break;
+
+                case BlockTypes.MegaStar:
+                    this.node.dispatchEvent(new cc.Event.EventCustom("megaStar", true));
                     this.node.destroy();
                     break;
 

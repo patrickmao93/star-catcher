@@ -532,6 +532,7 @@
     "minBlockSpeed": 140,
     "magnetChance": 0.3,
     "starChance": 0.8,
+    "megaStarChance": 0.1,
     "_id": "c7ivv/3qdHOamiFlDKx5ak"
   },
   {

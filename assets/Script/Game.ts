@@ -3,7 +3,8 @@ const { ccclass, property } = cc._decorator;
 export enum BlockTypes {
     Block = 1,
     Star = 2,
-    Magnet = 3
+    MegaStar = 3,
+    Magnet = 4
 }
 
 @ccclass
@@ -35,10 +36,12 @@ export default class Game extends cc.Component {
     @property
     starChance: number = 0.1;
 
+    @property
+    megaStarChance: number = 0.1;
+
+    public blockPool = new cc.NodePool();
     private time: number;
-    private blockPool = new cc.NodePool();
     private score = 0;
-    private blocks = [];
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -55,11 +58,27 @@ export default class Game extends cc.Component {
         this.node.on("magnet", e => {
             e.stopPropagation();
             const children = this.node.children;
+            children.forEach(child => {
+                const component = child.getComponent("Block");
+                if (
+                    component &&
+                    (component.blockType === BlockTypes.Star ||
+                        component.blockType === BlockTypes.MegaStar)
+                ) {
+                    component.attracted = true;
+                }
+            });
+        });
+
+        this.node.on("megaStar", e => {
+            e.stopPropagation();
+            const children = this.node.children;
             console.log("children", children);
             children.forEach(child => {
                 const component = child.getComponent("Block");
-                if (component && component.blockType === BlockTypes.Star) {
-                    component.attracted = true;
+                if (component && component.blockType === BlockTypes.Block) {
+                    console.log("component", component);
+                    component.init(this, BlockTypes.Star);
                 }
             });
         });
@@ -71,13 +90,13 @@ export default class Game extends cc.Component {
         this.time += dt;
 
         const roll = Math.random();
-        const chance = 0.001 * this.time ** 1.2;
+        const chance = 0.001 * this.time ** 1.3;
         if (roll < chance) {
-            console.log(chance);
             this.spawnBlock(this.getBlockSpawnPosition(), BlockTypes.Block);
 
             const magnetRoll = Math.random();
             const starRoll = Math.random();
+            const megaStarRoll = Math.random();
 
             if (starRoll < this.starChance) {
                 this.spawnBlock(this.getBlockSpawnPosition(), BlockTypes.Star);
@@ -85,6 +104,10 @@ export default class Game extends cc.Component {
 
             if (magnetRoll < this.magnetChance) {
                 this.spawnBlock(this.getBlockSpawnPosition(), BlockTypes.Magnet);
+            }
+
+            if (megaStarRoll < this.megaStarChance) {
+                this.spawnBlock(this.getBlockSpawnPosition(), BlockTypes.MegaStar);
             }
         }
         this.handlePlayerOutOfbound();
