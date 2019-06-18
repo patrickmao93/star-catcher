@@ -1,22 +1,50 @@
-// Learn TypeScript:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// Learn Attribute:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
-
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class Player extends cc.Component {
-    // LIFE-CYCLE CALLBACKS:
+    @property(cc.Prefab)
+    BulletPrefab: cc.Prefab = null;
 
-    onLoad() {}
+    private game = null;
+    private bulletPool: cc.NodePool = new cc.NodePool();
+    private fireTimer = 0;
 
-    start() {}
+    onLoad() {
+        for (let i = 0; i < 30; i++) {
+            const newBullet = cc.instantiate(this.BulletPrefab);
+            newBullet.getComponent("Bullet").init(this);
+            this.bulletPool.put(newBullet);
+        }
+    }
 
-    // update (dt) {}
+    update() {}
+
+    init(game) {
+        this.game = game;
+    }
+
+    startFiring = () => {
+        if (this.fireTimer > 0) {
+            this.fireTimer = 0;
+            return;
+        }
+        const fire = setInterval(() => {
+            const bullet = this.bulletPool.get();
+            const bulletPos = cc.v2(
+                this.node.position.x,
+                this.node.position.y + this.node.height / 2
+            );
+            bullet.setPosition(bulletPos);
+            this.game.node.addChild(bullet);
+            this.fireTimer += 0.1;
+            if (this.fireTimer >= this.game.fireDuration) {
+                this.fireTimer = 0;
+                clearInterval(fire);
+            }
+        }, 100);
+    };
+
+    recycleBullet = (bullet: cc.Node) => {
+        this.bulletPool.put(bullet);
+    };
 }

@@ -13,6 +13,9 @@ export default class Block extends cc.Component {
     @property(cc.SpriteFrame)
     magnetSprite: cc.SpriteFrame = null;
 
+    @property(cc.SpriteFrame)
+    rocketSprite: cc.SpriteFrame = null;
+
     public blockType = BlockTypes.Block;
     public attracted = false;
 
@@ -26,6 +29,11 @@ export default class Block extends cc.Component {
 
     init(game, type: BlockTypes) {
         this.game = game;
+
+        // init collision
+        cc.director.getCollisionManager().enabled = true;
+
+        // init sprite base on type
         switch (type) {
             case 1:
                 this.node.getComponent(cc.Sprite).spriteFrame = this.blockSprite;
@@ -49,6 +57,11 @@ export default class Block extends cc.Component {
                 this.blockType = BlockTypes.Magnet;
                 break;
 
+            case 5:
+                this.node.getComponent(cc.Sprite).spriteFrame = this.rocketSprite;
+                this.blockType = BlockTypes.Rocket;
+                break;
+
             default:
                 break;
         }
@@ -56,11 +69,9 @@ export default class Block extends cc.Component {
         this.collisionRadius = this.node.width;
     }
 
-    start() {}
-
     update(dt) {
         if (this.isBlockOutOfBound()) {
-            this.node.destroy();
+            this.game.recycleBlock(this.node);
         }
         if (this.attracted) {
             this.setVelocity(
@@ -93,6 +104,11 @@ export default class Block extends cc.Component {
                     this.node.destroy();
                     break;
 
+                case BlockTypes.Rocket:
+                    this.node.dispatchEvent(new cc.Event.EventCustom("rocket", true));
+                    this.node.destroy();
+                    break;
+
                 default:
                     break;
             }
@@ -117,5 +133,11 @@ export default class Block extends cc.Component {
         const playerPos = this.game.player.position;
         const dist = this.node.position.sub(playerPos).mag();
         return dist;
+    }
+
+    onCollisionEnter(other, self) {
+        if (this.blockType === BlockTypes.Block) {
+            this.game.recycleBlock(this.node);
+        }
     }
 }

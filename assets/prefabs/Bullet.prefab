@@ -12,7 +12,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Block",
+    "_name": "Bullet",
     "_objFlags": 0,
     "_parent": null,
     "_children": [],
@@ -52,8 +52,8 @@
     },
     "_position": {
       "__type__": "cc.Vec3",
-      "x": -81,
-      "y": -225,
+      "x": 82,
+      "y": -213,
       "z": 0
     },
     "_scale": {
@@ -73,7 +73,7 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "groupIndex": 1,
+    "groupIndex": 0,
     "_id": ""
   },
   {
@@ -85,7 +85,7 @@
     },
     "_enabled": true,
     "_spriteFrame": {
-      "__uuid__": "410fb916-8721-4663-bab8-34397391ace7"
+      "__uuid__": "bf0df41f-05d1-4c45-b578-0534fea599a2"
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -105,25 +105,14 @@
     "_id": ""
   },
   {
-    "__type__": "56592vtwJ9HX6henVc8BStQ",
+    "__type__": "c53ebkHLcxOtIlVxBOSAx+b",
     "_name": "",
     "_objFlags": 0,
     "node": {
       "__id__": 1
     },
     "_enabled": true,
-    "blockSprite": {
-      "__uuid__": "410fb916-8721-4663-bab8-34397391ace7"
-    },
-    "starSprite": {
-      "__uuid__": "ff80b0c0-9678-40f9-86bc-975b55b1455d"
-    },
-    "magnetSprite": {
-      "__uuid__": "b46a5b51-8726-4ec8-a9ed-52de8d60bcda"
-    },
-    "rocketSprite": {
-      "__uuid__": "8305dff3-25d3-46e4-943b-8f924590c5cb"
-    },
+    "speed": 1000,
     "_id": ""
   },
   {
@@ -153,9 +142,9 @@
       "__id__": 1
     },
     "asset": {
-      "__uuid__": "92a53b1c-b316-44fe-ae08-2d7c866e12d8"
+      "__uuid__": "62cf9146-fff2-4132-b340-650aa2b4ce53"
     },
-    "fileId": "74yei6BHRP4q0wrOdMpqEl",
+    "fileId": "18JykPTvlG0Zf4rT7foqZV",
     "sync": false
   }
 ]

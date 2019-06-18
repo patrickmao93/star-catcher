@@ -4,7 +4,8 @@ export enum BlockTypes {
     Block = 1,
     Star = 2,
     MegaStar = 3,
-    Magnet = 4
+    Magnet = 4,
+    Rocket = 5
 }
 
 @ccclass
@@ -39,7 +40,13 @@ export default class Game extends cc.Component {
     @property
     megaStarChance: number = 0.1;
 
-    public blockPool = new cc.NodePool();
+    @property
+    rocketChance: number = 0.1;
+
+    @property
+    fireDuration: number = 10;
+
+    private blockPool = new cc.NodePool();
     private time: number;
     private score = 0;
 
@@ -50,11 +57,15 @@ export default class Game extends cc.Component {
         this.time = 1;
         this.score = 0;
 
+        this.player.getComponent("Player").init(this);
+
+        // init block pool
         for (let i = 0; i < 100; i++) {
             let block = cc.instantiate(this.BlockPrefab);
             this.blockPool.put(block);
         }
 
+        // init event handlers for Item events
         this.node.on("magnet", e => {
             e.stopPropagation();
             const children = this.node.children;
@@ -73,14 +84,17 @@ export default class Game extends cc.Component {
         this.node.on("megaStar", e => {
             e.stopPropagation();
             const children = this.node.children;
-            console.log("children", children);
             children.forEach(child => {
                 const component = child.getComponent("Block");
                 if (component && component.blockType === BlockTypes.Block) {
-                    console.log("component", component);
                     component.init(this, BlockTypes.Star);
                 }
             });
+        });
+
+        this.node.on("rocket", e => {
+            e.stopPropagation();
+            this.player.getComponent("Player").startFiring();
         });
     }
 
@@ -97,6 +111,7 @@ export default class Game extends cc.Component {
             const magnetRoll = Math.random();
             const starRoll = Math.random();
             const megaStarRoll = Math.random();
+            const rocketRoll = Math.random();
 
             if (starRoll < this.starChance) {
                 this.spawnBlock(this.getBlockSpawnPosition(), BlockTypes.Star);
@@ -108,6 +123,10 @@ export default class Game extends cc.Component {
 
             if (megaStarRoll < this.megaStarChance) {
                 this.spawnBlock(this.getBlockSpawnPosition(), BlockTypes.MegaStar);
+            }
+
+            if (rocketRoll < this.rocketChance) {
+                this.spawnBlock(this.getBlockSpawnPosition(), BlockTypes.Rocket);
             }
         }
         this.handlePlayerOutOfbound();
@@ -155,6 +174,10 @@ export default class Game extends cc.Component {
         newBlock.getComponent("Block").setVelocity(velocity);
         this.node.addChild(newBlock);
         newBlock.setPosition(pos);
+    }
+
+    recycleBlock(block: cc.Node) {
+        this.blockPool.put(block);
     }
 
     getBlockVelocity(): cc.Vec2 {
